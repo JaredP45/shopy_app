@@ -17,7 +17,7 @@ def checkout(cart:dict, inventory:dict) -> str:
     """ Returns receipt of purchases """
     total = 0.0
     receipt = ""
-    # Lambda function for calcuating and formating reciept item
+    # Lambda function for calcuating and formating receipt item
     item_summary = lambda item, quantity, price: "{} {} at ${:.2f}.....${:.2f}\n".format(
         quantity,
         item,
