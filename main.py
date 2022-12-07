@@ -3,21 +3,22 @@ File Name: hw5_starter.py
 Started By: Emily Alfs-Votipka
 Completed By: Jared Paubel
 Section: CIS115 - 19C
-Description: 
+Description: Basic online shopping application.
 '''
 
 def price_check(item:str, inventory:dict) -> float:
     """ Returns price of selected item """
     for product,detail in inventory.items():
-        if item is product:
+        if item == product:
             return "${:.2f}".format(detail["price"])
-    return -1.0            
+    return -1.0
 
 def checkout(cart:dict, inventory:dict) -> str:
     """ Returns receipt of purchases """
     total = 0.0
     receipt = ""
-    item_desc = lambda item, quantity, price: "{} {} at ${:.2f}.....${:.2f}\n".format(
+    # Lambda function for calcuating and formating reciept item
+    item_summary = lambda item, quantity, price: "{} {} at ${:.2f}.....${:.2f}\n".format(
         quantity,
         item,
         price,
@@ -25,7 +26,7 @@ def checkout(cart:dict, inventory:dict) -> str:
     )
 
     for item,detail in cart.items():
-        receipt += item_desc(item, detail["quantity"], inventory[item]["price"])
+        receipt += item_summary(item, detail["quantity"], inventory[item]["price"])
         total += (detail["quantity"] * inventory[item]["price"])
     receipt += "Your total is ${:.2f}.\nThank you for shopping with us!".format(total)
     return receipt
@@ -35,7 +36,7 @@ def show_qty(inventory:dict) -> None:
     print("Here is our current inventory:")
     for item,detail in inventory.items():
         if detail["quantity"] > 0:
-            print("\t{} of {}".format(item, detail["quantity"]))
+            print("\t{} of {}".format(detail["quantity"], item))
         else:
             print("\t{}: out of stock.".format(item))
 
@@ -67,13 +68,13 @@ def add_to_cart(product:str, cart:dict, inventory:dict) -> bool:
         return False
 
 def remove_from_cart(product:str, cart:dict, inventory:dict) -> bool:
-    """ Returns boolean value indication whether item was removed from the cart """
+    """ Returns boolean value indicating whether item was removed from the cart """
     if product in cart.keys() and cart[product]["quantity"] > 0:
         inventory[product]["quantity"] += 1
         cart[product]["quantity"] -= 1
+        if cart[product]["quantity"] == 0:
+            del cart[product]
         return True
-    elif cart[product]["quantity"] == 0:
-        del cart[product]
     else:
         return False
 
@@ -92,12 +93,43 @@ def main():
         'Chicken': {'quantity': 4, 'price': 14.92}
     }
     cart = {}
+    shopping = True
+
     print("Welcome to our store!")
-    
-    # TODO: Develop loop cycle for user interaction
-    # shopping = True
-    # while shopping:
-    #     '''
-    #     Your code here! 
-    #     '''
+
+    while shopping:
+        print('''Do you want to:
+        Check (P)rice
+        (V)iew inventory
+        (S)how cart
+        (G)et item
+        (R)eturn an item from your cart? or
+        (C)heckout
+        ''')
+        userInput = input("Enter Choice: ")
+
+        if userInput in ["P", "p"]:
+            choice = str(input("What item do you want to check the price on? >> "))
+            print(price_check(choice, inventory))
+        elif userInput in ["V", "v"]:
+            show_qty(inventory)
+        elif userInput in ["S", "s"]:
+            show_cart(cart)
+        elif userInput in ["G", "g"]:
+            choice = str(input("What item do you want to add? >> "))
+            is_item_added = add_to_cart(choice, cart, inventory)
+            if is_item_added:
+                print("Item was added to cart")
+            else:
+                print("Item is not in stock")
+        elif userInput in ["R", "r"]:
+            choice = str(input("What item do you want to remove? >> "))
+            is_item_removed = remove_from_cart(choice, cart, inventory)
+            if is_item_removed:
+                print("Item was removed")
+            else:
+                print("Item is not in your cart")
+        elif userInput in ["C", "c"]:
+            print(checkout(cart, inventory))
+            shopping = False
 main()
